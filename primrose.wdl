@@ -4,10 +4,10 @@ version 1.0
 workflow PrimroseAlign {
     input {
         Array[File] bamFiles
-        File: refFasta
-        String: sample
-        String: refName
-        String dockerImage = "docker.io/xiaoyuz/biotools"
+        File refFasta
+        String sample
+        String refName
+        String dockerImage
     }
 
     scatter(bam in bamFiles) {
@@ -19,19 +19,18 @@ workflow PrimroseAlign {
 
         call Primrose {
             input:
-                Extracthifi.bam,
+                inputBam = Extracthifi.outputBam,
                 dockerImage = dockerImage
-            }
         }
     }
 
     call Pbmm2 {
         input:
             inputBams = Primrose.outputBam,
-            fasta = ref_fasta,
+            fasta = refFasta,
             refName = refName,
             sample = sample,
-            dockerImage= dockerImage
+            dockerImage = dockerImage
     }
 
     call BamSort {
@@ -58,7 +57,7 @@ task Extracthifi {
 
     command {
         set -e
-        extracthifi {inputBam} {outputBam}
+        extracthifi ${inputBam} ${outputBam}
     }
 
     output {
@@ -84,8 +83,8 @@ task Primrose {
         --keep-kinetics \
         --store-debug-tags \
         --log-file HG002.hifi.primrose.log \
-        {inputBam} \
-        {outputBam}
+        ${inputBam} \
+        ${outputBam}
     }
 
     output {
@@ -102,16 +101,16 @@ task Pbmm2 {
         String sample
         String refName
         Array[File] inputBams
-        File Fasta
+        File fasta
         String dockerImage
     }
     command {
         set -e
-        echo ${sep='\N' inputBams} > fofn
+        echo ${sep='\n' inputBams} > fofn
         pbmm2 align --preset CCS \
-        {Fasta} \
+        ${fasta} \
         fofn \
-        {outputBam}
+        ${outputBam}
     }
     output {
         File outputBam = "${sample}" + ".hifi.cpg." +  "${refName}" + ".bam"
@@ -130,11 +129,11 @@ task BamSort {
     command {
         set -e
         samtools sort \
-        -o {outputBam} \
-        {inputBam}
+        -o ${outputBam} \
+        ${inputBam}
     }
     output {
-        outputBam = "${sortBam}"
+        File outputBam = "${sortBam}"
     }
     runtime {
         docker: dockerImage
@@ -150,7 +149,7 @@ task BamIndex {
     command {
         set -e
         samtools index \
-        {inputBam}
+        ${inputBam}
     }
 
     runtime {
