@@ -57,7 +57,7 @@ task Extracthifi {
 
     command {
         set -e
-        extracthifi ${inputBam} ${outputBam}
+        extracthifi ${inputBam} ${hifiBam}
     }
 
     output {
@@ -84,7 +84,7 @@ task Primrose {
         --store-debug-tags \
         --log-file HG002.hifi.primrose.log \
         ${inputBam} \
-        ${outputBam}
+        ${cpgBam}
     }
 
     output {
@@ -104,16 +104,18 @@ task Pbmm2 {
         File fasta
         String dockerImage
     }
+
+    String outputBam = "${sample}" + ".hifi.cpg." +  "${refName}" + ".bam"
     command {
         set -e
-        echo ${sep='\n' inputBams} > fofn
+        printf '%s\n' ${sep=' ' inputBams} > bam.fofn
         pbmm2 align --preset CCS \
         ${fasta} \
-        fofn \
+        bam.fofn \
         ${outputBam}
     }
     output {
-        File outputBam = "${sample}" + ".hifi.cpg." +  "${refName}" + ".bam"
+        File outputBam = "${outputBam}"
     }
     runtime {
         docker: dockerImage
@@ -129,7 +131,7 @@ task BamSort {
     command {
         set -e
         samtools sort \
-        -o ${outputBam} \
+        -o ${sortBam} \
         ${inputBam}
     }
     output {
