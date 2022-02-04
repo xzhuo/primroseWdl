@@ -1,0 +1,12 @@
+{
+    "PrimroseAlign.bamFiles": [
+        "<a.reads.bam>",
+        "<b.reads.bam>",
+        "<c.reads.bam>",
+        "<d.reads.bam>"
+    ],
+    "PrimroseAlign.refFasta": "<fasta>",
+    "PrimroseAlign.sample": "<sample>",
+    "PrimroseAlign.refName": "<fasta name>",
+    "PrimroseAlign.dockerImage": "docker.io/xiaoyuz/biotools"
+}
