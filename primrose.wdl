@@ -44,14 +44,6 @@ workflow PrimroseAlign {
             inputBam = BamSort.outputBam,
             dockerImage= dockerImage
     }
-
-    output {
-        Array[File] hifi = Extracthifi.outputBam
-        Array[File] cpg = Primrose.outputBam
-        # File map = Pbmm2.outputBam
-        File sort = BamSort.outputBam
-        File bai = BamIndex.outputBai
-    }
 }
 
 
@@ -74,6 +66,8 @@ task Extracthifi {
 
     runtime {
         docker: dockerImage
+        cpu : "8"
+        memory: "4 GB"
     }
 }
 
@@ -101,6 +95,8 @@ task Primrose {
 
     runtime {
         docker: dockerImage
+        cpu : "16"
+        memory: "8 GB"
     }
 }
 
@@ -127,6 +123,8 @@ task Pbmm2 {
     }
     runtime {
         docker: dockerImage
+        cpu : "16"
+        memory: "64 GB"
     }
 }
 
@@ -139,6 +137,8 @@ task BamSort {
     command {
         set -e
         samtools sort \
+        -@ 16
+        -m 8G \
         -o ${sortBam} \
         ${inputBam}
     }
@@ -147,6 +147,8 @@ task BamSort {
     }
     runtime {
         docker: dockerImage
+        cpu : "16"
+        memory: "256 GB"
     }
 }
 
@@ -161,6 +163,7 @@ task BamIndex {
     command {
         set -e
         samtools index \
+        -@ 16
         ${inputBam} \
         ${bai}
     }
@@ -169,5 +172,7 @@ task BamIndex {
     }
     runtime {
         docker: dockerImage
+        cpu : "16"
+        memory: "4 GB"
     }
 }
