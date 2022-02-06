@@ -44,6 +44,14 @@ workflow PrimroseAlign {
             inputBam = BamSort.outputBam,
             dockerImage= dockerImage
     }
+
+    output {
+        Array[File] hifi = Extracthifi.outputBam
+        Array[File] cpg = Primrose.outputBam
+        # File map = Pbmm2.outputBam
+        File sort = BamSort.outputBam
+        File bai = BamIndex.outputBai
+    }
 }
 
 
