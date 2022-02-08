@@ -145,7 +145,7 @@ task BamSort {
     command {
         set -e
         samtools sort \
-        -@ 16
+        -@ 16 \
         -m 8G \
         -o ${sortBam} \
         ${inputBam}
@@ -171,7 +171,7 @@ task BamIndex {
     command {
         set -e
         samtools index \
-        -@ 16
+        -@ 16 \
         ${inputBam} \
         ${bai}
     }
